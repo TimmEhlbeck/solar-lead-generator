@@ -41,7 +41,7 @@ import {
   Eye,
 } from 'lucide-react';
 import axios from 'axios';
-import LeadDetailModal from '../../components/Sales/LeadDetailModal';
+import LeadDetailModal from '@/Components/Sales/LeadDetailModal';
 
 type LeadStatus = 'new' | 'assigned' | 'contacted' | 'qualified' | 'converted' | 'lost';
 type RequestType = 'Angebot anfordern' | 'Beratungsgespräch' | 'Vor-Ort-Besichtigung' | 'Allgemeine Anfrage' | 'quote' | 'consultation';

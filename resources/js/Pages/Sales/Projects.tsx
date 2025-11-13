@@ -10,9 +10,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from '../../Components/ui/dialog';
-import { StatusBadge, ProjectStatus, getStatusOptions } from '../../components/StatusBadge';
-import { Timeline, TimelineEvent } from '../../components/Timeline';
+} from '@/Components/ui/dialog';
+import { StatusBadge, ProjectStatus, getStatusOptions } from '@/Components/StatusBadge';
+import { Timeline, TimelineEvent } from '@/Components/Timeline';
 import {
   User,
   MapPin,

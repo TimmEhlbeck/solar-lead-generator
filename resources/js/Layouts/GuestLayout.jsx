@@ -1,6 +1,6 @@
 import { Link, usePage } from '@inertiajs/react';
 import { Sun } from 'lucide-react';
-import { DynamicTheme } from '../components/DynamicTheme';
+import { DynamicTheme } from '@/Components/DynamicTheme';
 
 export default function GuestLayout({ children }) {
     const { props } = usePage();

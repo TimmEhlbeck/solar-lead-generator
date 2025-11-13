@@ -16,7 +16,7 @@ import {
   Mail
 } from 'lucide-react';
 import { Button } from '@/Components/ui/button';
-import { DynamicTheme } from '../components/DynamicTheme';
+import { DynamicTheme } from '@/Components/DynamicTheme';
 
 interface DashboardLayoutProps extends PropsWithChildren {
   auth: {

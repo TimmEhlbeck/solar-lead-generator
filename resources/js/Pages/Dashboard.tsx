@@ -10,7 +10,7 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '../Components/ui/dialog';
+} from '@/Components/ui/dialog';
 import {
   Plus,
   Trash2,
@@ -22,8 +22,8 @@ import {
   Clock
 } from 'lucide-react';
 import axios from 'axios';
-import { StatusBadge, ProjectStatus } from '../components/StatusBadge';
-import { Timeline, TimelineEvent } from '../components/Timeline';
+import { StatusBadge, ProjectStatus } from '@/Components/StatusBadge';
+import { Timeline, TimelineEvent } from '@/Components/Timeline';
 
 interface Project {
   id: number;

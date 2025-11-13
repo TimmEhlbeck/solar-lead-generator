@@ -1,12 +1,12 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { Head, usePage } from '@inertiajs/react';
 import { GoogleGenAI, Type } from '@google/genai';
-import { ControlPanel } from '../components/ControlPanel';
-import { MapWrapper } from '../components/MapWrapper';
+import { ControlPanel } from '@/Components/ControlPanel';
+import { MapWrapper } from '@/Components/MapWrapper';
 import { AppState, PanelType, SolarAnalysis, RoofArea } from '../types';
 import { PANEL_DEFINITIONS } from '../constants';
-import { FullScreenError } from '../components/FullScreenError';
-import { Header } from '../components/Header';
+import { FullScreenError } from '@/Components/FullScreenError';
+import { Header } from '@/Components/Header';
 
 // TypeScript global type definitions for Google Maps
 declare global {

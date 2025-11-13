@@ -13,7 +13,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '../Components/ui/dialog';
+} from '@/Components/ui/dialog';
 import { User, Lock, Trash2, CheckCircle, AlertCircle } from 'lucide-react';
 
 interface ProfileProps {
