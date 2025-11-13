@@ -1,11 +1,11 @@
 import React, { useState, FormEvent } from 'react';
 import { Head, useForm, router } from '@inertiajs/react';
 import DashboardLayout from '../../Layouts/DashboardLayout';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/Components/ui/card';
+import { Button } from '@/Components/ui/button';
+import { Input } from '@/Components/ui/input';
+import { Label } from '@/Components/ui/label';
+import { Alert, AlertDescription } from '@/Components/ui/alert';
 import { Mail, Save, Eye, Code } from 'lucide-react';
 
 interface EmailTemplate {

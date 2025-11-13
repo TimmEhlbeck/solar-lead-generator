@@ -15,7 +15,7 @@ import {
   Briefcase,
   Mail
 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/Components/ui/button';
 import { DynamicTheme } from '../components/DynamicTheme';
 
 interface DashboardLayoutProps extends PropsWithChildren {
