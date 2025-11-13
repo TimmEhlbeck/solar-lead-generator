@@ -3,7 +3,7 @@ import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import GuestLayout from '@/Layouts/GuestLayout';
 import { Head, Link, useForm } from '@inertiajs/react';
-import { Button } from '../../components/ui/button';
+import { Button } from '@/components/ui/button';
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -30,7 +30,7 @@ export default function Register() {
                     Konto erstellen
                 </h2>
                 <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                    Registrieren Sie sich für ein neues Konto
+                    Registrieren Sie sich fï¿½r ein neues Konto
                 </p>
             </div>
 
@@ -89,7 +89,7 @@ export default function Register() {
                 <div className="mt-4">
                     <InputLabel
                         htmlFor="password_confirmation"
-                        value="Passwort bestätigen"
+                        value="Passwort bestï¿½tigen"
                     />
 
                     <TextInput
