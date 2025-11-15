@@ -61,6 +61,7 @@ export default function Settings({ auth, settings }: SettingsPageProps) {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     post(route('admin.settings.update'), {
+      forceFormData: true,
       onSuccess: () => {
         setSuccessMessage('Einstellungen erfolgreich gespeichert');
         setTimeout(() => setSuccessMessage(null), 3000);

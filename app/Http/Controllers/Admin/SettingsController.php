@@ -17,6 +17,11 @@ class SettingsController extends Controller
     {
         $settings = CompanySetting::getAllSettings();
 
+        // Add full URL for logo if it exists
+        if (isset($settings['company_logo']) && $settings['company_logo']) {
+            $settings['company_logo_url'] = Storage::url($settings['company_logo']);
+        }
+
         return Inertia::render('Admin/Settings', [
             'auth' => [
                 'user' => $request->user()->load('roles'),
