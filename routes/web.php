@@ -78,6 +78,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->group(functio
     Route::get('/settings', [SettingsController::class, 'index'])->name('admin.settings.index');
     Route::post('/settings', [SettingsController::class, 'update'])->name('admin.settings.update');
     Route::delete('/settings/logo', [SettingsController::class, 'deleteLogo'])->name('admin.settings.deleteLogo');
+    Route::delete('/settings/favicon', [SettingsController::class, 'deleteFavicon'])->name('admin.settings.deleteFavicon');
 
     // Email Template Management
     Route::get('/email-templates', [App\Http\Controllers\Admin\EmailTemplateController::class, 'index'])->name('admin.email-templates.index');

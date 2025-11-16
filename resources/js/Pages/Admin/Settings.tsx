@@ -23,11 +23,15 @@ export default function Settings({ auth, settings }: SettingsPageProps) {
   const [logoPreview, setLogoPreview] = useState<string | null>(
     settings.company_logo_url || null
   );
+  const [faviconPreview, setFaviconPreview] = useState<string | null>(
+    settings.company_favicon_url || null
+  );
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const { data, setData, post, processing, errors } = useForm({
     company_name: settings.company_name || '',
     company_logo: null as File | null,
+    company_favicon: null as File | null,
     primary_color: settings.primary_color || '#EAB308',
     secondary_color: settings.secondary_color || '#1F2937',
     accent_color: settings.accent_color || '#3B82F6',
@@ -47,12 +51,35 @@ export default function Settings({ auth, settings }: SettingsPageProps) {
     }
   };
 
+  const handleFaviconChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setData('company_favicon', file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setFaviconPreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleDeleteLogo = () => {
     router.delete(route('admin.settings.deleteLogo'), {
       onSuccess: () => {
         setLogoPreview(null);
         setData('company_logo', null);
         setSuccessMessage('Logo erfolgreich gelöscht');
+        setTimeout(() => setSuccessMessage(null), 3000);
+      },
+    });
+  };
+
+  const handleDeleteFavicon = () => {
+    router.delete(route('admin.settings.deleteFavicon'), {
+      onSuccess: () => {
+        setFaviconPreview(null);
+        setData('company_favicon', null);
+        setSuccessMessage('Favicon erfolgreich gelöscht');
         setTimeout(() => setSuccessMessage(null), 3000);
       },
     });
@@ -154,6 +181,45 @@ export default function Settings({ auth, settings }: SettingsPageProps) {
                       </p>
                       {errors.company_logo && (
                         <p className="text-sm text-red-600">{errors.company_logo}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="company_favicon">Favicon</Label>
+                  <div className="flex items-start gap-4">
+                    {faviconPreview && (
+                      <div className="relative">
+                        <img
+                          src={faviconPreview}
+                          alt="Favicon Vorschau"
+                          className="h-16 w-16 object-contain border rounded-lg"
+                        />
+                        <Button
+                          type="button"
+                          variant="destructive"
+                          size="sm"
+                          className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
+                          onClick={handleDeleteFavicon}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    )}
+                    <div className="flex-1">
+                      <Input
+                        id="company_favicon"
+                        type="file"
+                        accept="image/x-icon,image/png,image/svg+xml"
+                        onChange={handleFaviconChange}
+                        className="cursor-pointer"
+                      />
+                      <p className="text-sm text-gray-500 mt-1">
+                        Maximale Dateigröße: 1MB. Unterstützte Formate: ICO, PNG (empfohlen: 32x32px oder 64x64px)
+                      </p>
+                      {errors.company_favicon && (
+                        <p className="text-sm text-red-600">{errors.company_favicon}</p>
                       )}
                     </div>
                   </div>

@@ -25,6 +25,11 @@ class ShareCompanySettings
             $settings['company_logo_url'] = Storage::url($settings['company_logo']);
         }
 
+        // Add full URL for favicon if it exists
+        if (isset($settings['company_favicon']) && $settings['company_favicon']) {
+            $settings['company_favicon_url'] = Storage::url($settings['company_favicon']);
+        }
+
         Inertia::share('companySettings', $settings);
 
         return $next($request);

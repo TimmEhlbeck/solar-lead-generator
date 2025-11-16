@@ -36,7 +36,7 @@ interface ControlPanelProps {
 
 const InfoCard: React.FC<{ icon: React.ReactNode; title: string; value: string; unit: string }> = ({ icon, title, value, unit }) => (
     <div className="bg-gray-700/50 rounded-lg p-4 flex flex-col items-center justify-center text-center">
-        <div className="text-yellow-400 mb-2">{icon}</div>
+        <div className="mb-2" style={{ color: 'var(--company-primary)' }}>{icon}</div>
         <p className="text-sm text-gray-300">{title}</p>
         <p className="text-2xl font-bold text-white">{value}</p>
         <p className="text-xs text-gray-400">{unit}</p>
@@ -44,8 +44,8 @@ const InfoCard: React.FC<{ icon: React.ReactNode; title: string; value: string; 
 );
 
 const Step: React.FC<{ num: number; title: string; active: boolean; children: React.ReactNode }> = ({ num, title, active, children }) => (
-    <div className={`p-4 border-l-4 ${active ? 'border-yellow-400 bg-gray-800/50' : 'border-gray-600'}`}>
-        <h3 className={`text-lg font-semibold ${active ? 'text-yellow-400' : 'text-gray-400'}`}>Schritt {num}: {title}</h3>
+    <div className={`p-4 border-l-4 ${active ? 'bg-gray-800/50' : 'border-gray-600'}`} style={active ? { borderColor: 'var(--company-primary)' } : {}}>
+        <h3 className={`text-lg font-semibold ${active ? '' : 'text-gray-400'}`} style={active ? { color: 'var(--company-primary)' } : {}}>Schritt {num}: {title}</h3>
         {active && <div className="mt-4 space-y-4">{children}</div>}
     </div>
 );
@@ -88,7 +88,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
     <aside className="w-full md:w-96 lg:w-[450px] bg-gray-800 p-4 flex flex-col h-full overflow-y-auto shadow-2xl">
       <header className="mb-6 text-center">
         <h1 className="text-3xl font-bold text-white flex items-center justify-center gap-2">
-            <Sun className="text-yellow-400"/> Solarplaner KI
+            <Sun style={{ color: 'var(--company-primary)' }}/> Solarplaner KI
         </h1>
         <p className="text-gray-400 text-sm mt-1">Planen Sie Ihre Solaranlage mit KI-gestützten Erkenntnissen.</p>
       </header>
@@ -105,12 +105,15 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         <Step num={2} title="Dachflächen verwalten" active={isLocationSelected}>
             <p className="text-gray-300 text-sm">Zeichnen Sie eine oder mehrere Dachflächen. Wählen Sie eine Fläche aus, um sie zu konfigurieren.</p>
             <div className="space-y-2">
-                {roofs.map(roof => (
-                    <div key={roof.id} 
+                {roofs.map(roof => {
+                    const isActive = activeRoofId === roof.id;
+                    return (
+                    <div key={roof.id}
                          onClick={() => onSelectRoof(roof.id)}
-                         className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${activeRoofId === roof.id ? 'bg-yellow-500/20 ring-2 ring-yellow-400' : 'bg-gray-700 hover:bg-gray-600'}`}>
+                         className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${isActive ? 'ring-2' : 'bg-gray-700 hover:bg-gray-600'}`}
+                         style={isActive ? { backgroundColor: 'var(--company-primary)', opacity: 0.2, borderColor: 'var(--company-primary)' } : {}}>
                         <div className="flex items-center gap-3">
-                            <MapPin className={`h-5 w-5 ${activeRoofId === roof.id ? 'text-yellow-400' : 'text-gray-400'}`} />
+                            <MapPin className={`h-5 w-5 ${isActive ? '' : 'text-gray-400'}`} style={isActive ? { color: 'var(--company-primary)' } : {}} />
                             <span className="font-medium text-white">{roof.name}</span>
                         </div>
                         <button
@@ -121,7 +124,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                             <Trash2 size={18}/>
                         </button>
                     </div>
-                ))}
+                    );
+                })}
             </div>
             <button
                 onClick={onStartNewDrawing}
@@ -138,7 +142,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                     id="panelType"
                     value={panelType}
                     onChange={(e) => setPanelType(e.target.value as PanelType)}
-                    className="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-2 focus:ring-yellow-500 focus:border-yellow-500"
+                    className="w-full bg-gray-700 border border-gray-600 text-white rounded-lg p-2 focus:ring-2"
+                    style={{ '--tw-ring-color': 'var(--company-primary)' } as React.CSSProperties}
                 >
                     {Object.values(PanelType).map(pt => (
                         <option key={pt} value={pt}>{pt} ({PANEL_DEFINITIONS[pt].watts}W)</option>
@@ -154,7 +159,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                     max="60"
                     value={tiltAngle}
                     onChange={(e) => setTiltAngle(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer range-lg accent-yellow-400"
+                    className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer range-lg"
+                    style={{ accentColor: 'var(--company-primary)' }}
                 />
             </div>
 
@@ -228,7 +234,8 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
                     max="359"
                     value={orientationAngle}
                     onChange={(e) => setOrientationAngle(Number(e.target.value))}
-                    className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer range-lg accent-yellow-400"
+                    className="w-full h-2 bg-gray-600 rounded-lg appearance-none cursor-pointer range-lg"
+                    style={{ accentColor: 'var(--company-primary)' }}
                 />
             </div>
         </Step>
@@ -237,7 +244,21 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
              <button
                 onClick={onAnalysis}
                 disabled={isLoading || panelCount === 0}
-                className="w-full flex items-center justify-center gap-2 bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-3 px-4 rounded-lg transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
+                className="w-full flex items-center justify-center gap-2 text-gray-900 font-bold py-3 px-4 rounded-lg transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed"
+                style={isLoading || panelCount === 0 ? {} : {
+                    backgroundColor: 'var(--company-primary)',
+                    filter: 'brightness(1)',
+                }}
+                onMouseEnter={(e) => {
+                    if (!(isLoading || panelCount === 0)) {
+                        e.currentTarget.style.filter = 'brightness(1.1)';
+                    }
+                }}
+                onMouseLeave={(e) => {
+                    if (!(isLoading || panelCount === 0)) {
+                        e.currentTarget.style.filter = 'brightness(1)';
+                    }
+                }}
             >
                 {isLoading ? (
                     <>
@@ -276,7 +297,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
         {appState === AppState.RESULTS && analysisResult && (
              <div className="p-4 space-y-4 animate-fade-in">
                 <div className="bg-gray-900 rounded-lg p-4 space-y-4">
-                    <h3 className="text-xl font-semibold text-yellow-400 text-center">Ergebnisse der KI-Analyse</h3>
+                    <h3 className="text-xl font-semibold text-center" style={{ color: 'var(--company-primary)' }}>Ergebnisse der KI-Analyse</h3>
                     <div className="grid grid-cols-2 gap-4">
                         <InfoCard icon={<Zap size={24}/>} title="Jährliche Produktion" value={analysisResult.annualProductionKWh.toLocaleString()} unit="kWh / Jahr"/>
                         <InfoCard icon={<DollarSign size={24}/>} title="Jährliche Ersparnis" value={`€${analysisResult.annualSavingsEUR.toLocaleString()}`} unit="EUR / Jahr"/>

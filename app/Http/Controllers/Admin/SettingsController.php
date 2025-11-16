@@ -22,6 +22,11 @@ class SettingsController extends Controller
             $settings['company_logo_url'] = Storage::url($settings['company_logo']);
         }
 
+        // Add full URL for favicon if it exists
+        if (isset($settings['company_favicon']) && $settings['company_favicon']) {
+            $settings['company_favicon_url'] = Storage::url($settings['company_favicon']);
+        }
+
         return Inertia::render('Admin/Settings', [
             'auth' => [
                 'user' => $request->user()->load('roles'),
@@ -38,6 +43,7 @@ class SettingsController extends Controller
         $validated = $request->validate([
             'company_name' => 'nullable|string|max:255',
             'company_logo' => 'nullable|file|image|max:2048',
+            'company_favicon' => 'nullable|file|mimes:ico,png,svg|max:1024',
             'primary_color' => 'nullable|string|regex:/^#[0-9A-F]{6}$/i',
             'secondary_color' => 'nullable|string|regex:/^#[0-9A-F]{6}$/i',
             'accent_color' => 'nullable|string|regex:/^#[0-9A-F]{6}$/i',
@@ -47,6 +53,8 @@ class SettingsController extends Controller
 
         foreach ($validated as $key => $value) {
             if ($key === 'company_logo' && $value) {
+                CompanySetting::uploadFile($key, $value);
+            } elseif ($key === 'company_favicon' && $value) {
                 CompanySetting::uploadFile($key, $value);
             } elseif ($value !== null) {
                 CompanySetting::set($key, $value);
@@ -72,5 +80,21 @@ class SettingsController extends Controller
         }
 
         return redirect()->back()->with('success', 'Logo erfolgreich gelöscht');
+    }
+
+    /**
+     * Delete favicon
+     */
+    public function deleteFavicon()
+    {
+        $favicon = CompanySetting::where('key', 'company_favicon')->first();
+
+        if ($favicon && $favicon->value) {
+            Storage::disk('public')->delete($favicon->value);
+            CompanySetting::set('company_favicon', null, 'file');
+            CompanySetting::clearCache();
+        }
+
+        return redirect()->back()->with('success', 'Favicon erfolgreich gelöscht');
     }
 }
