@@ -49,6 +49,9 @@ class SettingsController extends Controller
             'accent_color' => 'nullable|string|regex:/^#[0-9A-F]{6}$/i',
             'background_color' => 'nullable|string|regex:/^#[0-9A-F]{6}$/i',
             'text_color' => 'nullable|string|regex:/^#[0-9A-F]{6}$/i',
+            'email_header_title' => 'nullable|string|max:255',
+            'email_footer_text' => 'nullable|string|max:500',
+            'email_footer_contact' => 'nullable|string|max:1000',
         ]);
 
         foreach ($validated as $key => $value) {

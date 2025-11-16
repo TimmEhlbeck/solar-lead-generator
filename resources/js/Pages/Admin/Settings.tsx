@@ -6,7 +6,8 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Alert, AlertDescription } from '@/Components/ui/alert';
-import { Settings as SettingsIcon, Upload, X, Save, Palette, Building2 } from 'lucide-react';
+import { Settings as SettingsIcon, Upload, X, Save, Palette, Building2, Mail } from 'lucide-react';
+import { Textarea } from '@/Components/ui/textarea';
 
 interface SettingsPageProps {
   auth: {
@@ -37,6 +38,9 @@ export default function Settings({ auth, settings }: SettingsPageProps) {
     accent_color: settings.accent_color || '#3B82F6',
     background_color: settings.background_color || '#111827',
     text_color: settings.text_color || '#FFFFFF',
+    email_header_title: settings.email_header_title || 'Willkommen',
+    email_footer_text: settings.email_footer_text || 'Ihr Partner für nachhaltige Energie',
+    email_footer_contact: settings.email_footer_contact || '',
   });
 
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -223,6 +227,71 @@ export default function Settings({ auth, settings }: SettingsPageProps) {
                       )}
                     </div>
                   </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Email Settings */}
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Mail className="h-5 w-5" />
+                  E-Mail-Einstellungen
+                </CardTitle>
+                <CardDescription>
+                  Globale Einstellungen für E-Mail-Header und Footer
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="email_header_title">E-Mail Header Überschrift</Label>
+                  <Input
+                    id="email_header_title"
+                    type="text"
+                    value={data.email_header_title}
+                    onChange={(e) => setData('email_header_title', e.target.value)}
+                    placeholder="z.B. Willkommen"
+                  />
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Die Standard-Überschrift im Header aller E-Mails. Kann in einzelnen Templates überschrieben werden.
+                  </p>
+                  {errors.email_header_title && (
+                    <p className="text-sm text-red-600">{errors.email_header_title}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email_footer_text">E-Mail Footer Text</Label>
+                  <Input
+                    id="email_footer_text"
+                    type="text"
+                    value={data.email_footer_text}
+                    onChange={(e) => setData('email_footer_text', e.target.value)}
+                    placeholder="z.B. Ihr Partner für nachhaltige Energie"
+                  />
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Der Text, der in der Fußzeile aller E-Mails angezeigt wird.
+                  </p>
+                  {errors.email_footer_text && (
+                    <p className="text-sm text-red-600">{errors.email_footer_text}</p>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="email_footer_contact">Kontaktinformationen (Footer)</Label>
+                  <Textarea
+                    id="email_footer_contact"
+                    value={data.email_footer_contact}
+                    onChange={(e) => setData('email_footer_contact', e.target.value)}
+                    placeholder="z.B. Adresse, Telefon, E-Mail"
+                    rows={3}
+                  />
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Optionale Kontaktinformationen für den E-Mail-Footer (z.B. Adresse, Telefon, E-Mail).
+                  </p>
+                  {errors.email_footer_contact && (
+                    <p className="text-sm text-red-600">{errors.email_footer_contact}</p>
+                  )}
                 </div>
               </CardContent>
             </Card>
