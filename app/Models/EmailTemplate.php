@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class EmailTemplate extends Model
 {
@@ -54,6 +55,9 @@ class EmailTemplate extends Model
      */
     public function render(array $data): array
     {
+        // Auto-inject company settings into data
+        $data = $this->injectCompanySettings($data);
+
         $subject = $this->subject;
         $content = $this->content;
 
@@ -68,6 +72,35 @@ class EmailTemplate extends Model
             'subject' => $subject,
             'content' => $content,
         ];
+    }
+
+    /**
+     * Inject company settings into the data array.
+     *
+     * @param array $data
+     * @return array
+     */
+    private function injectCompanySettings(array $data): array
+    {
+        $settings = CompanySetting::getAllSettings();
+
+        // Add company name
+        $data['company_name'] = $settings['company_name'] ?? config('app.name');
+
+        // Add company colors
+        $data['primary_color'] = $settings['primary_color'] ?? '#0A2540';
+        $data['secondary_color'] = $settings['secondary_color'] ?? '#1F2937';
+        $data['accent_color'] = $settings['accent_color'] ?? '#3B82F6';
+
+        // Add company logo URL with full path
+        if (isset($settings['company_logo']) && $settings['company_logo']) {
+            $data['company_logo_url'] = url(Storage::url($settings['company_logo']));
+        }
+
+        // Add app URL
+        $data['app_url'] = config('app.url');
+
+        return $data;
     }
 
     /**
