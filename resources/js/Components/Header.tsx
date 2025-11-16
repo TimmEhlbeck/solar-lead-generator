@@ -44,10 +44,10 @@ export const Header: React.FC<HeaderProps> = ({
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
               {logoUrl ? (
-                <img src={logoUrl} alt={displayName} className="h-10 w-10 object-contain" />
+                <img src={logoUrl} alt={displayName} className="h-10 w-auto object-contain" />
               ) : (
-                <div className="bg-primary rounded-lg p-2">
-                  <Sun className="h-6 w-6 text-primary-foreground" />
+                <div className="rounded-lg p-2" style={{ backgroundColor: 'var(--company-primary)' }}>
+                  <Sun className="h-6 w-6" style={{ color: 'var(--company-text)' }} />
                 </div>
               )}
               <div>

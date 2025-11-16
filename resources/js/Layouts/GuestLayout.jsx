@@ -6,6 +6,7 @@ export default function GuestLayout({ children }) {
     const { props } = usePage();
     const settings = props.companySettings || {};
     const companyName = settings.company_name || 'GW Energytec';
+    const companyLogo = settings.company_logo_url;
 
     return (
         <>
@@ -13,9 +14,13 @@ export default function GuestLayout({ children }) {
             <div className="flex min-h-screen flex-col items-center pt-6 sm:justify-center sm:pt-0" style={{ backgroundColor: 'var(--company-background)' }}>
                 <div>
                     <Link href="/" className="flex flex-col items-center gap-3">
-                        <div className="rounded-lg p-4" style={{ backgroundColor: 'var(--company-primary)' }}>
-                            <Sun className="h-12 w-12" style={{ color: 'var(--company-text)' }} />
-                        </div>
+                        {companyLogo ? (
+                            <img src={companyLogo} alt={companyName} className="h-16 w-auto object-contain" />
+                        ) : (
+                            <div className="rounded-lg p-4" style={{ backgroundColor: 'var(--company-primary)' }}>
+                                <Sun className="h-12 w-12" style={{ color: 'var(--company-text)' }} />
+                            </div>
+                        )}
                         <span className="text-2xl font-bold" style={{ color: 'var(--company-text)' }}>
                             {companyName}
                         </span>

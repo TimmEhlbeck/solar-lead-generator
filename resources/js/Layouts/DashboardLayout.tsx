@@ -1,5 +1,5 @@
 import React, { PropsWithChildren } from 'react';
-import { Link, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import {
   Home,
   Sun,
@@ -68,6 +68,10 @@ const getNavigation = (user: { is_admin?: boolean; roles?: string[] }) => {
 
 export default function DashboardLayout({ auth, header, children }: DashboardLayoutProps) {
   const navigation = getNavigation(auth.user);
+  const { props } = usePage();
+  const settings = (props as any).companySettings || {};
+  const companyName = settings.company_name || 'GW Energytec';
+  const companyLogo = settings.company_logo_url;
 
   const handleLogout = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -88,10 +92,14 @@ export default function DashboardLayout({ auth, header, children }: DashboardLay
           {/* Logo */}
           <div className="flex h-16 items-center px-6">
             <Link href="/" className="flex items-center gap-2">
-              <div className="rounded-lg p-2" style={{ backgroundColor: 'var(--company-primary)' }}>
-                <Sun className="h-6 w-6" style={{ color: 'var(--company-text)' }} />
-              </div>
-              <span className="text-xl font-bold" style={{ color: 'var(--company-text)' }}>GW Energytec</span>
+              {companyLogo ? (
+                <img src={companyLogo} alt={companyName} className="h-10 w-auto object-contain" />
+              ) : (
+                <div className="rounded-lg p-2" style={{ backgroundColor: 'var(--company-primary)' }}>
+                  <Sun className="h-6 w-6" style={{ color: 'var(--company-text)' }} />
+                </div>
+              )}
+              <span className="text-xl font-bold" style={{ color: 'var(--company-text)' }}>{companyName}</span>
             </Link>
           </div>
 
