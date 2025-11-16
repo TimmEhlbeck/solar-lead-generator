@@ -85,7 +85,7 @@ export const ControlPanel: React.FC<ControlPanelProps> = ({
 
 
   return (
-    <aside className="w-full md:w-96 lg:w-[450px] bg-gray-800 p-4 flex flex-col h-full overflow-y-auto shadow-2xl">
+    <aside className="w-full md:w-96 lg:w-[450px] p-4 flex flex-col h-full overflow-y-auto shadow-2xl" style={{ backgroundColor: 'var(--company-secondary)' }}>
       <header className="mb-6 text-center">
         <h1 className="text-3xl font-bold text-white flex items-center justify-center gap-2">
             <Sun style={{ color: 'var(--company-primary)' }}/> Solarplaner KI
