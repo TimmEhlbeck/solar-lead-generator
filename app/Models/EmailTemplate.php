@@ -142,6 +142,7 @@ class EmailTemplate extends Model
         $footerText = $structured['footerText'] ?? 'Ihr Partner für nachhaltige Energie';
         $footerContact = $structured['footerContact'] ?? '';
 
+        // Don't escape HTML in headerTitle and footerText as they may contain variables
         $html = '<!DOCTYPE html>
 <html lang="de">
 <head>
@@ -165,17 +166,17 @@ class EmailTemplate extends Model
 <body>
     <div class="email-container">
         <div class="header">
-            <h1>' . htmlspecialchars($headerTitle) . '</h1>
+            <h1>' . $headerTitle . '</h1>
         </div>
         <div class="content">
             ' . $contentHtml . '
         </div>
         <div class="footer">
             <p><strong>{{company_name}}</strong></p>
-            <p>' . htmlspecialchars($footerText) . '</p>';
+            <p>' . $footerText . '</p>';
 
         if (!empty($footerContact)) {
-            $html .= '<p>' . nl2br(htmlspecialchars($footerContact)) . '</p>';
+            $html .= '<p>' . nl2br($footerContact) . '</p>';
         }
 
         $html .= '
