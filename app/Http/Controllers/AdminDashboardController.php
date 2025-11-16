@@ -54,7 +54,6 @@ class AdminDashboardController extends Controller
                     'name' => $lead->name,
                     'email' => $lead->email,
                     'phone' => $lead->phone,
-                    'address' => $lead->address,
                     'status' => $lead->status,
                     'created_at' => $lead->created_at->format('d.m.Y H:i'),
                 ];
