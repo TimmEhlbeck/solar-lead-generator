@@ -6,8 +6,13 @@ import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
 import { Label } from '@/Components/ui/label';
 import { Alert, AlertDescription } from '@/Components/ui/alert';
-import { Mail, Save, Eye, Code, Type, FileText, Plus, X } from 'lucide-react';
+import { Mail, Save, Eye, Type, FileText } from 'lucide-react';
 import { Textarea } from '@/Components/ui/textarea';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Link from '@tiptap/extension-link';
+import TextAlign from '@tiptap/extension-text-align';
 
 interface EmailTemplate {
   id: number;
@@ -24,18 +29,9 @@ interface EmailTemplate {
 
 interface StructuredContent {
   headerTitle: string;
-  greeting: string;
-  paragraphs: string[];
-  infoBoxTitle?: string;
-  infoBoxContent?: string;
-  buttonText?: string;
-  buttonUrl?: string;
-  listItems?: string[];
-  closing: string;
+  contentHtml: string;
   footerText: string;
   footerContact?: string;
-  primaryColor?: string;
-  secondaryColor?: string;
 }
 
 interface EmailTemplatesPageProps {
@@ -49,86 +45,145 @@ interface EmailTemplatesPageProps {
   templates: EmailTemplate[];
 }
 
-// Parse HTML to extract structured content
-const parseHtmlToStructured = (html: string): StructuredContent => {
+// Extract content from HTML (between content divs)
+const extractContentHtml = (html: string): string => {
   const parser = new DOMParser();
   const doc = parser.parseFromString(html, 'text/html');
-
-  // Extract header title
-  const headerTitle = doc.querySelector('.header h1')?.textContent || 'Willkommen';
-
-  // Extract content paragraphs
   const contentDiv = doc.querySelector('.content');
-  const allParagraphs = contentDiv ? Array.from(contentDiv.querySelectorAll('p')) : [];
 
-  let greeting = '';
-  let paragraphs: string[] = [];
-  let closing = '';
-  let buttonText = '';
-  let buttonUrl = '';
+  if (!contentDiv) return '';
 
-  // First paragraph is greeting
-  if (allParagraphs.length > 0) {
-    greeting = allParagraphs[0]?.textContent || '';
-  }
+  // Get inner HTML without the wrapper
+  return contentDiv.innerHTML;
+};
 
-  // Extract button
-  const button = contentDiv?.querySelector('.button');
-  if (button) {
-    buttonText = button.textContent || '';
-    buttonUrl = button.getAttribute('href') || '{{app_url}}';
-  }
+// Extract header title from HTML
+const extractHeaderTitle = (html: string): string => {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
+  const headerH1 = doc.querySelector('.header h1');
+  return headerH1?.textContent || 'Willkommen';
+};
 
-  // Extract info box
-  const infoBox = doc.querySelector('.info-box, .credentials, .lead-info');
-  const infoBoxTitle = infoBox?.querySelector('h2, h3')?.textContent || '';
-  const infoBoxParagraphs = infoBox ? Array.from(infoBox.querySelectorAll('p')).map(p => p.textContent || '') : [];
-  const infoBoxContent = infoBoxParagraphs.join('\n');
-
-  // Extract list items
-  const list = contentDiv?.querySelector('ul');
-  const listItems = list ? Array.from(list.querySelectorAll('li')).map(li => li.textContent || '') : [];
-
-  // Extract footer
+// Extract footer info from HTML
+const extractFooterInfo = (html: string): { footerText: string; footerContact: string } => {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, 'text/html');
   const footer = doc.querySelector('.footer');
-  const footerParagraphs = footer ? Array.from(footer.querySelectorAll('p')) : [];
-  const footerText = footerParagraphs.length > 1 ? footerParagraphs[1]?.textContent || '' : 'Ihr Partner für nachhaltige Energie';
+  const paragraphs = footer ? Array.from(footer.querySelectorAll('p')) : [];
 
-  // Middle paragraphs (excluding first greeting and assuming last before closing)
-  // We'll identify paragraphs that are not in info boxes
-  const contentParagraphs = contentDiv ? Array.from(contentDiv.querySelectorAll('p:not(.info-box p):not(.credentials p):not(.lead-info p)')) : [];
+  const footerText = paragraphs.length > 1 ? paragraphs[1]?.textContent || '' : 'Ihr Partner für nachhaltige Energie';
+  const footerContact = paragraphs.length > 2 && !paragraphs[2]?.textContent?.includes('©')
+    ? paragraphs[2]?.textContent || ''
+    : '';
 
-  // Filter out button container and greeting
-  paragraphs = contentParagraphs
-    .slice(1) // Skip greeting
-    .map(p => p.textContent || '')
-    .filter(text => text.trim() && !text.includes(buttonText)); // Remove button container
+  return { footerText, footerContact };
+};
 
-  // Find closing (usually starts with "Mit freundlichen Grüßen" or similar)
-  const closingIndex = paragraphs.findIndex(p =>
-    p.includes('freundlichen Grüßen') ||
-    p.includes('Fragen stehen wir') ||
-    p.includes('Bei Fragen')
-  );
-
-  if (closingIndex !== -1) {
-    closing = paragraphs.slice(closingIndex).join('\n');
-    paragraphs = paragraphs.slice(0, closingIndex);
+const MenuBar = ({ editor }: { editor: any }) => {
+  if (!editor) {
+    return null;
   }
 
-  return {
-    headerTitle,
-    greeting,
-    paragraphs: paragraphs.filter(p => p.trim()),
-    infoBoxTitle: infoBoxTitle || undefined,
-    infoBoxContent: infoBoxContent || undefined,
-    buttonText: buttonText || undefined,
-    buttonUrl: buttonUrl || undefined,
-    listItems: listItems.length > 0 ? listItems : undefined,
-    closing,
-    footerText,
-    footerContact: '',
-  };
+  return (
+    <div className="border border-gray-300 dark:border-gray-600 rounded-t-lg p-2 bg-gray-50 dark:bg-gray-800 flex flex-wrap gap-1">
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        className={`px-3 py-1 rounded text-sm font-medium ${
+          editor.isActive('bold') ? 'bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-800' : 'bg-white dark:bg-gray-700'
+        }`}
+      >
+        Fett
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        className={`px-3 py-1 rounded text-sm font-medium ${
+          editor.isActive('italic') ? 'bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-800' : 'bg-white dark:bg-gray-700'
+        }`}
+      >
+        Kursiv
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().setParagraph().run()}
+        className={`px-3 py-1 rounded text-sm ${
+          editor.isActive('paragraph') ? 'bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-800' : 'bg-white dark:bg-gray-700'
+        }`}
+      >
+        Absatz
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+        className={`px-3 py-1 rounded text-sm ${
+          editor.isActive('heading', { level: 2 }) ? 'bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-800' : 'bg-white dark:bg-gray-700'
+        }`}
+      >
+        H2
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+        className={`px-3 py-1 rounded text-sm ${
+          editor.isActive('heading', { level: 3 }) ? 'bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-800' : 'bg-white dark:bg-gray-700'
+        }`}
+      >
+        H3
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        className={`px-3 py-1 rounded text-sm ${
+          editor.isActive('bulletList') ? 'bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-800' : 'bg-white dark:bg-gray-700'
+        }`}
+      >
+        Liste
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          const url = window.prompt('URL eingeben:');
+          if (url) {
+            editor.chain().focus().setLink({ href: url }).run();
+          }
+        }}
+        className={`px-3 py-1 rounded text-sm ${
+          editor.isActive('link') ? 'bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-800' : 'bg-white dark:bg-gray-700'
+        }`}
+      >
+        Link
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().setTextAlign('left').run()}
+        className={`px-3 py-1 rounded text-sm ${
+          editor.isActive({ textAlign: 'left' }) ? 'bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-800' : 'bg-white dark:bg-gray-700'
+        }`}
+      >
+        Links
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().setTextAlign('center').run()}
+        className={`px-3 py-1 rounded text-sm ${
+          editor.isActive({ textAlign: 'center' }) ? 'bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-800' : 'bg-white dark:bg-gray-700'
+        }`}
+      >
+        Zentriert
+      </button>
+      <button
+        type="button"
+        onClick={() => editor.chain().focus().setTextAlign('right').run()}
+        className={`px-3 py-1 rounded text-sm ${
+          editor.isActive({ textAlign: 'right' }) ? 'bg-gray-800 text-white dark:bg-gray-200 dark:text-gray-800' : 'bg-white dark:bg-gray-700'
+        }`}
+      >
+        Rechts
+      </button>
+    </div>
+  );
 };
 
 export default function EmailTemplates({ auth, templates }: EmailTemplatesPageProps) {
@@ -138,45 +193,60 @@ export default function EmailTemplates({ auth, templates }: EmailTemplatesPagePr
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [previewHtml, setPreviewHtml] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
-  const [showHTMLEditor, setShowHTMLEditor] = useState(false);
 
-  // Visual editor state
-  const [structuredData, setStructuredData] = useState<StructuredContent>({
-    headerTitle: '',
-    greeting: '',
-    paragraphs: [],
-    closing: '',
-    footerText: '',
-  });
+  // Structured content state
+  const [headerTitle, setHeaderTitle] = useState('');
+  const [footerText, setFooterText] = useState('');
+  const [footerContact, setFooterContact] = useState('');
 
   const { data, setData, put, processing, errors } = useForm({
     subject: selectedTemplate?.subject || '',
-    content: selectedTemplate?.content || '',
-    structured_content: selectedTemplate?.structured_content || null,
   });
 
-  // Update form when template selection changes
+  // TipTap editor for content
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Link.configure({
+        openOnClick: false,
+      }),
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
+    ],
+    content: '',
+    editorProps: {
+      attributes: {
+        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none min-h-[400px] p-4',
+      },
+    },
+  });
+
+  // Update editor when template changes
   useEffect(() => {
     if (selectedTemplate) {
-      setData({
-        subject: selectedTemplate.subject,
-        content: selectedTemplate.content,
-        structured_content: selectedTemplate.structured_content,
-      });
+      setData('subject', selectedTemplate.subject);
 
-      // Initialize structured data from template
       if (selectedTemplate.structured_content) {
-        setStructuredData(selectedTemplate.structured_content);
+        // Use structured content
+        setHeaderTitle(selectedTemplate.structured_content.headerTitle);
+        setFooterText(selectedTemplate.structured_content.footerText);
+        setFooterContact(selectedTemplate.structured_content.footerContact || '');
+        editor?.commands.setContent(selectedTemplate.structured_content.contentHtml);
       } else {
-        // Parse HTML to create structured data
-        setStructuredData(parseHtmlToStructured(selectedTemplate.content));
+        // Parse HTML
+        setHeaderTitle(extractHeaderTitle(selectedTemplate.content));
+        const footerInfo = extractFooterInfo(selectedTemplate.content);
+        setFooterText(footerInfo.footerText);
+        setFooterContact(footerInfo.footerContact);
+        const contentHtml = extractContentHtml(selectedTemplate.content);
+        editor?.commands.setContent(contentHtml);
       }
 
       setShowPreview(false);
       setPreviewHtml(null);
-      setShowHTMLEditor(false);
     }
-  }, [selectedTemplate]);
+  }, [selectedTemplate, editor]);
 
   const handleTemplateSelect = (template: EmailTemplate) => {
     setSelectedTemplate(template);
@@ -184,23 +254,22 @@ export default function EmailTemplates({ auth, templates }: EmailTemplatesPagePr
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    if (!selectedTemplate) return;
+    if (!selectedTemplate || !editor) return;
 
-    const submitData: any = {
-      subject: data.subject,
+    const contentHtml = editor.getHTML();
+
+    const structuredContent: StructuredContent = {
+      headerTitle,
+      contentHtml,
+      footerText,
+      footerContact,
     };
 
-    if (showHTMLEditor) {
-      // HTML mode: submit content directly
-      submitData.content = data.content;
-      submitData.structured_content = null;
-    } else {
-      // Visual mode: submit structured content
-      submitData.structured_content = structuredData;
-    }
-
     put(route('admin.email-templates.update', selectedTemplate.id), {
-      data: submitData,
+      data: {
+        subject: data.subject,
+        structured_content: structuredContent,
+      },
       onSuccess: () => {
         setSuccessMessage('Email-Template erfolgreich gespeichert');
         setTimeout(() => setSuccessMessage(null), 3000);
@@ -210,7 +279,16 @@ export default function EmailTemplates({ auth, templates }: EmailTemplatesPagePr
   };
 
   const handlePreview = async () => {
-    if (!selectedTemplate) return;
+    if (!selectedTemplate || !editor) return;
+
+    const contentHtml = editor.getHTML();
+
+    const structuredContent: StructuredContent = {
+      headerTitle,
+      contentHtml,
+      footerText,
+      footerContact,
+    };
 
     let sampleData: Record<string, any> = {
       company_name: 'GW Energytec',
@@ -246,17 +324,6 @@ export default function EmailTemplates({ auth, templates }: EmailTemplatesPagePr
     }
 
     try {
-      const requestBody: any = {
-        data: sampleData,
-        subject: data.subject,
-      };
-
-      if (showHTMLEditor) {
-        requestBody.content = data.content;
-      } else {
-        requestBody.structured_content = structuredData;
-      }
-
       const response = await fetch(
         route('admin.email-templates.preview', selectedTemplate.id),
         {
@@ -265,7 +332,11 @@ export default function EmailTemplates({ auth, templates }: EmailTemplatesPagePr
             'Content-Type': 'application/json',
             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
           },
-          body: JSON.stringify(requestBody),
+          body: JSON.stringify({
+            data: sampleData,
+            subject: data.subject,
+            structured_content: structuredContent,
+          }),
         }
       );
 
@@ -277,54 +348,6 @@ export default function EmailTemplates({ auth, templates }: EmailTemplatesPagePr
     } catch (error) {
       console.error('Preview error:', error);
     }
-  };
-
-  const updateStructuredField = (field: keyof StructuredContent, value: any) => {
-    setStructuredData(prev => ({ ...prev, [field]: value }));
-  };
-
-  const updateParagraph = (index: number, value: string) => {
-    setStructuredData(prev => {
-      const newParagraphs = [...prev.paragraphs];
-      newParagraphs[index] = value;
-      return { ...prev, paragraphs: newParagraphs };
-    });
-  };
-
-  const addParagraph = () => {
-    setStructuredData(prev => ({
-      ...prev,
-      paragraphs: [...prev.paragraphs, ''],
-    }));
-  };
-
-  const removeParagraph = (index: number) => {
-    setStructuredData(prev => ({
-      ...prev,
-      paragraphs: prev.paragraphs.filter((_, i) => i !== index),
-    }));
-  };
-
-  const addListItem = () => {
-    setStructuredData(prev => ({
-      ...prev,
-      listItems: [...(prev.listItems || []), ''],
-    }));
-  };
-
-  const updateListItem = (index: number, value: string) => {
-    setStructuredData(prev => {
-      const newItems = [...(prev.listItems || [])];
-      newItems[index] = value;
-      return { ...prev, listItems: newItems };
-    });
-  };
-
-  const removeListItem = (index: number) => {
-    setStructuredData(prev => ({
-      ...prev,
-      listItems: (prev.listItems || []).filter((_, i) => i !== index),
-    }));
   };
 
   return (
@@ -386,35 +409,18 @@ export default function EmailTemplates({ auth, templates }: EmailTemplatesPagePr
             <div className="lg:col-span-3">
               {selectedTemplate ? (
                 <form onSubmit={handleSubmit} className="space-y-6">
-                  {/* Template Info */}
                   <Card>
                     <CardHeader>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <CardTitle>{selectedTemplate.name}</CardTitle>
-                          <CardDescription>
-                            {selectedTemplate.description || 'Bearbeiten Sie dieses Email-Template'}
-                          </CardDescription>
-                        </div>
-                        <div className="flex gap-2">
-                          <Button
-                            type="button"
-                            variant={showHTMLEditor ? "default" : "outline"}
-                            size="sm"
-                            onClick={() => setShowHTMLEditor(!showHTMLEditor)}
-                            className="gap-2"
-                          >
-                            <Code className="h-4 w-4" />
-                            {showHTMLEditor ? 'Visueller Editor' : 'HTML-Editor'}
-                          </Button>
-                        </div>
-                      </div>
+                      <CardTitle>{selectedTemplate.name}</CardTitle>
+                      <CardDescription>
+                        {selectedTemplate.description || 'Bearbeiten Sie dieses Email-Template'}
+                      </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                       {/* Variables Info */}
                       <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
                         <div className="flex items-start gap-2">
-                          <Code className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                          <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
                           <div className="flex-1">
                             <h4 className="font-medium text-sm text-blue-900 dark:text-blue-100 mb-2">
                               Verfügbare Variablen
@@ -459,233 +465,75 @@ export default function EmailTemplates({ auth, templates }: EmailTemplatesPagePr
                         )}
                       </div>
 
-                      {/* Content Editor - HTML or Visual */}
-                      {showHTMLEditor ? (
-                        <div className="space-y-2">
-                          <Label htmlFor="content" className="flex items-center gap-2">
-                            <Code className="h-4 w-4" />
-                            HTML-Inhalt (Erweitert)
-                          </Label>
-                          <Textarea
-                            id="content"
-                            value={data.content}
-                            onChange={(e) => setData('content', e.target.value)}
-                            rows={20}
-                            className="font-mono text-xs"
-                            placeholder="HTML-Inhalt des Email-Templates..."
-                          />
-                          {errors.content && (
-                            <p className="text-sm text-red-600 dark:text-red-400">{errors.content}</p>
-                          )}
-                          <p className="text-xs text-gray-500 dark:text-gray-400">
-                            Vollständiger HTML-Code der Email. Nur für fortgeschrittene Benutzer.
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="space-y-4">
-                          {/* Visual Editor */}
-                          <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                            <div className="flex items-center gap-2 mb-3">
-                              <FileText className="h-5 w-5 text-gray-600 dark:text-gray-400" />
-                              <h4 className="font-medium text-sm dark:text-gray-200">Visueller Editor</h4>
-                            </div>
-                            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-                              Bearbeiten Sie den Email-Inhalt ohne HTML-Code. Alle Felder unterstützen Variablen wie {`{{name}}`} oder {`{{company_name}}`}.
-                            </p>
-                          </div>
+                      {/* Tabs for Content, Header, Footer */}
+                      <Tabs defaultValue="content" className="w-full">
+                        <TabsList className="grid w-full grid-cols-3">
+                          <TabsTrigger value="content">Email-Inhalt</TabsTrigger>
+                          <TabsTrigger value="header">Header</TabsTrigger>
+                          <TabsTrigger value="footer">Footer</TabsTrigger>
+                        </TabsList>
 
-                          {/* Header Title */}
+                        {/* Content Tab */}
+                        <TabsContent value="content" className="space-y-4">
+                          <div className="space-y-2">
+                            <Label>Email-Inhalt (WYSIWYG-Editor)</Label>
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              Bearbeiten Sie den Hauptinhalt der Email. Variablen wie {`{{name}}`} können direkt im Text verwendet werden.
+                            </p>
+                            <MenuBar editor={editor} />
+                            <div className="border border-gray-300 dark:border-gray-600 rounded-b-lg bg-white dark:bg-gray-900">
+                              <EditorContent editor={editor} />
+                            </div>
+                          </div>
+                        </TabsContent>
+
+                        {/* Header Tab */}
+                        <TabsContent value="header" className="space-y-4">
                           <div className="space-y-2">
                             <Label htmlFor="headerTitle">Email-Überschrift (Header)</Label>
                             <Input
                               id="headerTitle"
-                              value={structuredData.headerTitle}
-                              onChange={(e) => updateStructuredField('headerTitle', e.target.value)}
+                              value={headerTitle}
+                              onChange={(e) => setHeaderTitle(e.target.value)}
                               placeholder="z.B. Willkommen bei {{company_name}}"
                             />
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Die große Überschrift oben in der Email
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              Diese Überschrift erscheint im farbigen Header-Bereich oben in der Email.
+                              Variablen wie {`{{company_name}}`} werden automatisch ersetzt.
                             </p>
                           </div>
+                        </TabsContent>
 
-                          {/* Greeting */}
+                        {/* Footer Tab */}
+                        <TabsContent value="footer" className="space-y-4">
                           <div className="space-y-2">
-                            <Label htmlFor="greeting">Begrüßung</Label>
+                            <Label htmlFor="footerText">Footer-Text</Label>
                             <Input
-                              id="greeting"
-                              value={structuredData.greeting}
-                              onChange={(e) => updateStructuredField('greeting', e.target.value)}
-                              placeholder="z.B. Hallo {{name}},"
+                              id="footerText"
+                              value={footerText}
+                              onChange={(e) => setFooterText(e.target.value)}
+                              placeholder="z.B. Ihr Partner für nachhaltige Energie"
                             />
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Die persönliche Begrüßung zu Beginn
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              Der Haupt-Text in der Fußzeile der Email.
                             </p>
                           </div>
 
-                          {/* Main Paragraphs */}
                           <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                              <Label>Haupt-Textabschnitte</Label>
-                              <Button
-                                type="button"
-                                size="sm"
-                                variant="outline"
-                                onClick={addParagraph}
-                                className="gap-1"
-                              >
-                                <Plus className="h-3 w-3" />
-                                Absatz hinzufügen
-                              </Button>
-                            </div>
-                            {structuredData.paragraphs.map((paragraph, index) => (
-                              <div key={index} className="flex gap-2">
-                                <Textarea
-                                  value={paragraph}
-                                  onChange={(e) => updateParagraph(index, e.target.value)}
-                                  placeholder={`Absatz ${index + 1}`}
-                                  rows={2}
-                                  className="flex-1"
-                                />
-                                <Button
-                                  type="button"
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => removeParagraph(index)}
-                                  className="self-start"
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            ))}
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Die Haupt-Textabschnitte Ihrer Email
-                            </p>
-                          </div>
-
-                          {/* Info Box (Optional) */}
-                          <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-3">
-                            <h5 className="font-medium text-sm">Info-Box (optional)</h5>
-                            <div className="space-y-2">
-                              <Label htmlFor="infoBoxTitle">Box-Überschrift</Label>
-                              <Input
-                                id="infoBoxTitle"
-                                value={structuredData.infoBoxTitle || ''}
-                                onChange={(e) => updateStructuredField('infoBoxTitle', e.target.value)}
-                                placeholder="z.B. Ihre Zugangsdaten"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="infoBoxContent">Box-Inhalt</Label>
-                              <Textarea
-                                id="infoBoxContent"
-                                value={structuredData.infoBoxContent || ''}
-                                onChange={(e) => updateStructuredField('infoBoxContent', e.target.value)}
-                                placeholder="Wichtige Informationen..."
-                                rows={3}
-                              />
-                            </div>
-                          </div>
-
-                          {/* Button (Optional) */}
-                          <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-3">
-                            <h5 className="font-medium text-sm">Button (optional)</h5>
-                            <div className="grid grid-cols-2 gap-3">
-                              <div className="space-y-2">
-                                <Label htmlFor="buttonText">Button-Text</Label>
-                                <Input
-                                  id="buttonText"
-                                  value={structuredData.buttonText || ''}
-                                  onChange={(e) => updateStructuredField('buttonText', e.target.value)}
-                                  placeholder="z.B. Jetzt anmelden"
-                                />
-                              </div>
-                              <div className="space-y-2">
-                                <Label htmlFor="buttonUrl">Button-Link</Label>
-                                <Input
-                                  id="buttonUrl"
-                                  value={structuredData.buttonUrl || ''}
-                                  onChange={(e) => updateStructuredField('buttonUrl', e.target.value)}
-                                  placeholder="z.B. {{app_url}}/login"
-                                />
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* List Items (Optional) */}
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-between">
-                              <Label>Aufzählungsliste (optional)</Label>
-                              <Button
-                                type="button"
-                                size="sm"
-                                variant="outline"
-                                onClick={addListItem}
-                                className="gap-1"
-                              >
-                                <Plus className="h-3 w-3" />
-                                Listenpunkt hinzufügen
-                              </Button>
-                            </div>
-                            {(structuredData.listItems || []).map((item, index) => (
-                              <div key={index} className="flex gap-2">
-                                <Input
-                                  value={item}
-                                  onChange={(e) => updateListItem(index, e.target.value)}
-                                  placeholder={`Listenpunkt ${index + 1}`}
-                                  className="flex-1"
-                                />
-                                <Button
-                                  type="button"
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={() => removeListItem(index)}
-                                >
-                                  <X className="h-4 w-4" />
-                                </Button>
-                              </div>
-                            ))}
-                          </div>
-
-                          {/* Closing */}
-                          <div className="space-y-2">
-                            <Label htmlFor="closing">Abschluss-Text</Label>
+                            <Label htmlFor="footerContact">Kontaktinformationen (optional)</Label>
                             <Textarea
-                              id="closing"
-                              value={structuredData.closing}
-                              onChange={(e) => updateStructuredField('closing', e.target.value)}
-                              placeholder="z.B. Mit freundlichen Grüßen,&#10;Ihr Team von {{company_name}}"
+                              id="footerContact"
+                              value={footerContact}
+                              onChange={(e) => setFooterContact(e.target.value)}
+                              placeholder="z.B. Adresse, Telefon, E-Mail"
                               rows={3}
                             />
-                            <p className="text-xs text-gray-500 dark:text-gray-400">
-                              Abschiedstext und Unterschrift
+                            <p className="text-sm text-gray-500 dark:text-gray-400">
+                              Optionale Kontaktinformationen für die Fußzeile.
                             </p>
                           </div>
-
-                          {/* Footer */}
-                          <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-3">
-                            <h5 className="font-medium text-sm">Fußzeile</h5>
-                            <div className="space-y-2">
-                              <Label htmlFor="footerText">Footer-Text</Label>
-                              <Input
-                                id="footerText"
-                                value={structuredData.footerText}
-                                onChange={(e) => updateStructuredField('footerText', e.target.value)}
-                                placeholder="z.B. Ihr Partner für nachhaltige Energie"
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label htmlFor="footerContact">Kontaktinformationen (optional)</Label>
-                              <Textarea
-                                id="footerContact"
-                                value={structuredData.footerContact || ''}
-                                onChange={(e) => updateStructuredField('footerContact', e.target.value)}
-                                placeholder="Adresse, Telefon, etc."
-                                rows={2}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      )}
+                        </TabsContent>
+                      </Tabs>
 
                       {/* Action Buttons */}
                       <div className="flex gap-3 pt-4 border-t dark:border-gray-700">

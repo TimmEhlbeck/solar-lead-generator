@@ -134,8 +134,13 @@ class EmailTemplate extends Model
     public function buildHtmlFromStructured(array $structured): string
     {
         $settings = CompanySetting::getAllSettings();
-        $primaryColor = $structured['primaryColor'] ?? ($settings['primary_color'] ?? '#EAB308');
-        $secondaryColor = $structured['secondaryColor'] ?? ($settings['secondary_color'] ?? '#1F2937');
+        $primaryColor = $settings['primary_color'] ?? '#EAB308';
+        $secondaryColor = $settings['secondary_color'] ?? '#1F2937';
+
+        $headerTitle = $structured['headerTitle'] ?? 'Willkommen';
+        $contentHtml = $structured['contentHtml'] ?? '';
+        $footerText = $structured['footerText'] ?? 'Ihr Partner für nachhaltige Energie';
+        $footerContact = $structured['footerContact'] ?? '';
 
         $html = '<!DOCTYPE html>
 <html lang="de">
@@ -145,80 +150,32 @@ class EmailTemplate extends Model
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f3f4f6; }
         .email-container { background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); }
-        .header { background-color: ' . $primaryColor . '; color: white; padding: 30px; text-align: center; }
+        .header { background-color: {{primary_color}}; color: white; padding: 30px; text-align: center; }
         .header h1 { margin: 0; font-size: 24px; font-weight: 600; }
         .content { background-color: #f9fafb; padding: 30px; }
-        .info-box { background-color: #ffffff; padding: 20px; border-left: 4px solid ' . $primaryColor . '; margin: 20px 0; border-radius: 4px; }
-        .button { display: inline-block; padding: 12px 24px; background-color: ' . $primaryColor . '; color: white !important; text-decoration: none; border-radius: 6px; font-weight: 600; margin: 15px 0; }
-        .footer { background-color: ' . $secondaryColor . '; color: #9ca3af; padding: 30px; text-align: center; font-size: 14px; }
+        .content p { margin: 10px 0; }
+        .content h2 { color: {{primary_color}}; margin: 20px 0 10px 0; }
+        .content h3 { color: {{primary_color}}; margin: 15px 0 10px 0; }
+        .content ul { margin: 10px 0; padding-left: 20px; }
+        .content a { color: {{primary_color}}; text-decoration: underline; }
+        .footer { background-color: {{secondary_color}}; color: #9ca3af; padding: 30px; text-align: center; font-size: 14px; }
         .footer p { margin: 8px 0; }
     </style>
 </head>
 <body>
     <div class="email-container">
         <div class="header">
-            <h1>' . htmlspecialchars($structured['headerTitle'] ?? 'Willkommen') . '</h1>
+            <h1>' . htmlspecialchars($headerTitle) . '</h1>
         </div>
-        <div class="content">';
-
-        // Add greeting
-        if (!empty($structured['greeting'])) {
-            $html .= '<p>' . nl2br(htmlspecialchars($structured['greeting'])) . '</p>';
-        }
-
-        // Add main paragraphs
-        if (!empty($structured['paragraphs']) && is_array($structured['paragraphs'])) {
-            foreach ($structured['paragraphs'] as $paragraph) {
-                if (!empty($paragraph)) {
-                    $html .= '<p>' . nl2br(htmlspecialchars($paragraph)) . '</p>';
-                }
-            }
-        }
-
-        // Add info box if present
-        if (!empty($structured['infoBoxTitle']) || !empty($structured['infoBoxContent'])) {
-            $html .= '<div class="info-box">';
-            if (!empty($structured['infoBoxTitle'])) {
-                $html .= '<h3>' . htmlspecialchars($structured['infoBoxTitle']) . '</h3>';
-            }
-            if (!empty($structured['infoBoxContent'])) {
-                $html .= '<p>' . nl2br(htmlspecialchars($structured['infoBoxContent'])) . '</p>';
-            }
-            $html .= '</div>';
-        }
-
-        // Add button if present
-        if (!empty($structured['buttonText'])) {
-            $buttonUrl = $structured['buttonUrl'] ?? '{{app_url}}';
-            $html .= '<p style="text-align: center;">
-                <a href="' . htmlspecialchars($buttonUrl) . '" class="button">' . htmlspecialchars($structured['buttonText']) . '</a>
-            </p>';
-        }
-
-        // Add list if present
-        if (!empty($structured['listItems']) && is_array($structured['listItems'])) {
-            $html .= '<ul>';
-            foreach ($structured['listItems'] as $item) {
-                if (!empty($item)) {
-                    $html .= '<li>' . htmlspecialchars($item) . '</li>';
-                }
-            }
-            $html .= '</ul>';
-        }
-
-        // Add closing
-        if (!empty($structured['closing'])) {
-            $html .= '<p>' . nl2br(htmlspecialchars($structured['closing'])) . '</p>';
-        }
-
-        $html .= '
+        <div class="content">
+            ' . $contentHtml . '
         </div>
         <div class="footer">
             <p><strong>{{company_name}}</strong></p>
-            <p>' . htmlspecialchars($structured['footerText'] ?? 'Ihr Partner für nachhaltige Energie') . '</p>';
+            <p>' . htmlspecialchars($footerText) . '</p>';
 
-        if (!empty($structured['footerContact'])) {
-            $html .= '<p>' . nl2br(htmlspecialchars($structured['footerContact'])) . '</p>';
+        if (!empty($footerContact)) {
+            $html .= '<p>' . nl2br(htmlspecialchars($footerContact)) . '</p>';
         }
 
         $html .= '
