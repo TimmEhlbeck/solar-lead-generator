@@ -58,6 +58,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->group(functio
     Route::get('/users', [UserManagementController::class, 'index'])->name('admin.users.index');
     Route::post('/users', [UserManagementController::class, 'store'])->name('admin.users.store');
     Route::put('/users/{user}', [UserManagementController::class, 'update'])->name('admin.users.update');
+    Route::post('/users/{user}/verify', [UserManagementController::class, 'verify'])->name('admin.users.verify');
     Route::delete('/users/{user}', [UserManagementController::class, 'destroy'])->name('admin.users.destroy');
 
     // Project Management

@@ -272,11 +272,27 @@ export default function UserManagement({ auth, users, roles }: UserManagementPro
                       </div>
                     </td>
                     <td className="px-4 py-4">
-                      {user.email_verified_at ? (
-                        <CheckCircle className="h-5 w-5 text-green-600" />
-                      ) : (
-                        <XCircle className="h-5 w-5 text-red-600" />
-                      )}
+                      <div className="flex items-center gap-2">
+                        {user.email_verified_at ? (
+                          <>
+                            <CheckCircle className="h-5 w-5 text-green-600" />
+                            <span className="text-xs text-gray-500">Verifiziert</span>
+                          </>
+                        ) : (
+                          <>
+                            <XCircle className="h-5 w-5 text-red-600" />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => router.post(`/admin/users/${user.id}/verify`)}
+                              className="ml-2"
+                            >
+                              <CheckCircle className="h-4 w-4 mr-1" />
+                              Verifizieren
+                            </Button>
+                          </>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-600 dark:text-gray-400">
                       {user.created_at}
