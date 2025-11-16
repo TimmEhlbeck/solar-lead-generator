@@ -60,7 +60,17 @@ class EmailTemplateController extends Controller
 
         $validated = $request->validate([
             'data' => 'required|array',
+            'subject' => 'nullable|string',
+            'content' => 'nullable|string',
         ]);
+
+        // Use provided subject and content if available (for live preview)
+        if (isset($validated['subject'])) {
+            $template->subject = $validated['subject'];
+        }
+        if (isset($validated['content'])) {
+            $template->content = $validated['content'];
+        }
 
         $rendered = $template->render($validated['data']);
 

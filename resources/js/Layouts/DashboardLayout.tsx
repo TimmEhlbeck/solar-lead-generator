@@ -54,6 +54,7 @@ const getNavigation = (user: { is_admin?: boolean; roles?: string[] | Array<{ na
       { name: 'Alle Projekte', href: '/admin/projects', icon: FolderOpen },
       { name: 'Alle Dokumente', href: '/admin/documents', icon: FileText },
       { name: 'Benutzer', href: '/admin/users', icon: Users },
+      { name: 'Email-Templates', href: '/admin/email-templates', icon: Mail },
       { name: 'Firmen-Einstellungen', href: '/admin/settings', icon: Settings },
     ];
   }
