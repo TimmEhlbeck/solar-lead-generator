@@ -9,6 +9,7 @@ import { Alert, AlertDescription } from '@/Components/ui/alert';
 import { Mail, Save, Eye, Type, FileText } from 'lucide-react';
 import { Textarea } from '@/Components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/Components/ui/dialog';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Link from '@tiptap/extension-link';
@@ -217,7 +218,7 @@ export default function EmailTemplates({ auth, templates }: EmailTemplatesPagePr
     content: '',
     editorProps: {
       attributes: {
-        class: 'prose prose-sm sm:prose lg:prose-lg xl:prose-2xl focus:outline-none min-h-[400px] p-4',
+        class: 'prose prose-sm max-w-none focus:outline-none min-h-[400px] p-4 text-sm',
       },
     },
   });
@@ -279,7 +280,9 @@ export default function EmailTemplates({ auth, templates }: EmailTemplatesPagePr
   };
 
   const handlePreview = async () => {
-    if (!selectedTemplate || !editor) return;
+    if (!selectedTemplate || !editor) {
+      return;
+    }
 
     const contentHtml = editor.getHTML();
 
@@ -562,28 +565,26 @@ export default function EmailTemplates({ auth, templates }: EmailTemplatesPagePr
                     </CardContent>
                   </Card>
 
-                  {/* Preview */}
-                  {showPreview && previewHtml && (
-                    <Card>
-                      <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
+                  {/* Preview Modal */}
+                  <Dialog open={showPreview} onOpenChange={setShowPreview}>
+                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                      <DialogHeader>
+                        <DialogTitle className="flex items-center gap-2">
                           <Eye className="h-5 w-5" />
-                          Vorschau
-                        </CardTitle>
-                        <CardDescription>
+                          Email-Vorschau
+                        </DialogTitle>
+                        <DialogDescription>
                           So sieht die Email mit Beispieldaten aus
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
-                          <div
-                            className="border rounded-lg bg-white max-w-2xl mx-auto"
-                            dangerouslySetInnerHTML={{ __html: previewHtml }}
-                          />
-                        </div>
-                      </CardContent>
-                    </Card>
-                  )}
+                        </DialogDescription>
+                      </DialogHeader>
+                      <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6">
+                        <div
+                          className="border rounded-lg bg-white mx-auto"
+                          dangerouslySetInnerHTML={{ __html: previewHtml }}
+                        />
+                      </div>
+                    </DialogContent>
+                  </Dialog>
                 </form>
               ) : (
                 <Card>
