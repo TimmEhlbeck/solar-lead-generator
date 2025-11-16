@@ -52,7 +52,7 @@ class UserManagementController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Password::defaults()],
-            'role' => ['required', 'string', 'in:user,sales,admin'],
+            'role' => ['required', 'string', 'exists:roles,name'],
         ]);
 
         $user = User::create([
@@ -77,7 +77,7 @@ class UserManagementController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
             'password' => ['nullable', 'confirmed', Password::defaults()],
-            'role' => ['required', 'string', 'in:user,sales,admin'],
+            'role' => ['required', 'string', 'exists:roles,name'],
         ]);
 
         $user->update([
