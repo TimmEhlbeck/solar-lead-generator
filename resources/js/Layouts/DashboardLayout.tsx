@@ -24,21 +24,28 @@ interface DashboardLayoutProps extends PropsWithChildren {
       name: string;
       email: string;
       is_admin?: boolean;
-      roles?: string[];
+      roles?: string[] | Array<{ name: string }>;
     };
   };
   header?: React.ReactNode;
 }
 
-const getNavigation = (user: { is_admin?: boolean; roles?: string[] }) => {
+const getNavigation = (user: { is_admin?: boolean; roles?: string[] | Array<{ name: string }> }) => {
   const baseNavigation = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
     { name: 'Dachplanung', href: '/', icon: Home },
   ];
 
+  // Normalize roles to string array
+  const roleNames = user.roles
+    ? Array.isArray(user.roles) && user.roles.length > 0 && typeof user.roles[0] === 'object'
+      ? (user.roles as Array<{ name: string }>).map(r => r.name)
+      : user.roles as string[]
+    : [];
+
   // Check if user has admin role
-  const isAdmin = user.is_admin || user.roles?.includes('admin');
-  const isSales = user.roles?.includes('sales');
+  const isAdmin = user.is_admin || roleNames.includes('admin');
+  const isSales = roleNames.includes('sales');
 
   if (isAdmin) {
     return [
@@ -47,7 +54,7 @@ const getNavigation = (user: { is_admin?: boolean; roles?: string[] }) => {
       { name: 'Alle Projekte', href: '/admin/projects', icon: FolderOpen },
       { name: 'Alle Dokumente', href: '/admin/documents', icon: FileText },
       { name: 'Benutzer', href: '/admin/users', icon: Users },
-      { name: 'Einstellungen', href: '/admin/settings', icon: Settings },
+      { name: 'Firmen-Einstellungen', href: '/admin/settings', icon: Settings },
     ];
   }
 
@@ -152,8 +159,8 @@ export default function DashboardLayout({ auth, header, children }: DashboardLay
                 className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm hover:bg-white/5 transition-colors"
                 style={{ color: 'rgba(255, 255, 255, 0.7)' }}
               >
-                <Settings className="h-4 w-4" />
-                Einstellungen
+                <User className="h-4 w-4" />
+                Mein Profil
               </Link>
 
               <button
