@@ -43,8 +43,14 @@ class EmailTemplateController extends Controller
 
         $validated = $request->validate([
             'subject' => 'required|string|max:255',
-            'content' => 'required|string',
+            'content' => 'nullable|string',
+            'structured_content' => 'nullable|array',
         ]);
+
+        // If structured content is provided, build HTML from it
+        if (isset($validated['structured_content'])) {
+            $validated['content'] = $template->buildHtmlFromStructured($validated['structured_content']);
+        }
 
         $template->update($validated);
 
@@ -62,13 +68,18 @@ class EmailTemplateController extends Controller
             'data' => 'required|array',
             'subject' => 'nullable|string',
             'content' => 'nullable|string',
+            'structured_content' => 'nullable|array',
         ]);
 
         // Use provided subject and content if available (for live preview)
         if (isset($validated['subject'])) {
             $template->subject = $validated['subject'];
         }
-        if (isset($validated['content'])) {
+
+        // If structured content is provided, build HTML from it
+        if (isset($validated['structured_content'])) {
+            $template->content = $template->buildHtmlFromStructured($validated['structured_content']);
+        } elseif (isset($validated['content'])) {
             $template->content = $validated['content'];
         }
 
