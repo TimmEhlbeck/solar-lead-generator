@@ -31,8 +31,6 @@ interface EmailTemplate {
 interface StructuredContent {
   headerTitle: string;
   contentHtml: string;
-  footerText: string;
-  footerContact?: string;
 }
 
 interface EmailTemplatesPageProps {
@@ -64,21 +62,6 @@ const extractHeaderTitle = (html: string): string => {
   const doc = parser.parseFromString(html, 'text/html');
   const headerH1 = doc.querySelector('.header h1');
   return headerH1?.textContent || 'Willkommen';
-};
-
-// Extract footer info from HTML
-const extractFooterInfo = (html: string): { footerText: string; footerContact: string } => {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(html, 'text/html');
-  const footer = doc.querySelector('.footer');
-  const paragraphs = footer ? Array.from(footer.querySelectorAll('p')) : [];
-
-  const footerText = paragraphs.length > 1 ? paragraphs[1]?.textContent || '' : 'Ihr Partner für nachhaltige Energie';
-  const footerContact = paragraphs.length > 2 && !paragraphs[2]?.textContent?.includes('©')
-    ? paragraphs[2]?.textContent || ''
-    : '';
-
-  return { footerText, footerContact };
 };
 
 const MenuBar = ({ editor }: { editor: any }) => {
@@ -195,10 +178,8 @@ export default function EmailTemplates({ auth, templates }: EmailTemplatesPagePr
   const [previewHtml, setPreviewHtml] = useState<string | null>(null);
   const [showPreview, setShowPreview] = useState(false);
 
-  // Structured content state
+  // Structured content state (only header, footer comes from company settings)
   const [headerTitle, setHeaderTitle] = useState('');
-  const [footerText, setFooterText] = useState('');
-  const [footerContact, setFooterContact] = useState('');
 
   const { data, setData, put, processing, errors } = useForm({
     subject: selectedTemplate?.subject || '',
@@ -231,15 +212,10 @@ export default function EmailTemplates({ auth, templates }: EmailTemplatesPagePr
       if (selectedTemplate.structured_content) {
         // Use structured content
         setHeaderTitle(selectedTemplate.structured_content.headerTitle);
-        setFooterText(selectedTemplate.structured_content.footerText);
-        setFooterContact(selectedTemplate.structured_content.footerContact || '');
         editor?.commands.setContent(selectedTemplate.structured_content.contentHtml);
       } else {
         // Parse HTML
         setHeaderTitle(extractHeaderTitle(selectedTemplate.content));
-        const footerInfo = extractFooterInfo(selectedTemplate.content);
-        setFooterText(footerInfo.footerText);
-        setFooterContact(footerInfo.footerContact);
         const contentHtml = extractContentHtml(selectedTemplate.content);
         editor?.commands.setContent(contentHtml);
       }
@@ -262,8 +238,6 @@ export default function EmailTemplates({ auth, templates }: EmailTemplatesPagePr
     const structuredContent: StructuredContent = {
       headerTitle,
       contentHtml,
-      footerText,
-      footerContact,
     };
 
     put(route('admin.email-templates.update', selectedTemplate.id), {
@@ -289,8 +263,6 @@ export default function EmailTemplates({ auth, templates }: EmailTemplatesPagePr
     const structuredContent: StructuredContent = {
       headerTitle,
       contentHtml,
-      footerText,
-      footerContact,
     };
 
     let sampleData: Record<string, any> = {
@@ -468,12 +440,11 @@ export default function EmailTemplates({ auth, templates }: EmailTemplatesPagePr
                         )}
                       </div>
 
-                      {/* Tabs for Content, Header, Footer */}
+                      {/* Tabs for Content and Header */}
                       <Tabs defaultValue="content" className="w-full">
-                        <TabsList className="grid w-full grid-cols-3">
+                        <TabsList className="grid w-full grid-cols-2">
                           <TabsTrigger value="content">Email-Inhalt</TabsTrigger>
                           <TabsTrigger value="header">Header</TabsTrigger>
-                          <TabsTrigger value="footer">Footer</TabsTrigger>
                         </TabsList>
 
                         {/* Content Tab */}
@@ -507,36 +478,19 @@ export default function EmailTemplates({ auth, templates }: EmailTemplatesPagePr
                           </div>
                         </TabsContent>
 
-                        {/* Footer Tab */}
-                        <TabsContent value="footer" className="space-y-4">
-                          <div className="space-y-2">
-                            <Label htmlFor="footerText">Footer-Text</Label>
-                            <Input
-                              id="footerText"
-                              value={footerText}
-                              onChange={(e) => setFooterText(e.target.value)}
-                              placeholder="z.B. Ihr Partner für nachhaltige Energie"
-                            />
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                              Der Haupt-Text in der Fußzeile der Email.
-                            </p>
-                          </div>
-
-                          <div className="space-y-2">
-                            <Label htmlFor="footerContact">Kontaktinformationen (optional)</Label>
-                            <Textarea
-                              id="footerContact"
-                              value={footerContact}
-                              onChange={(e) => setFooterContact(e.target.value)}
-                              placeholder="z.B. Adresse, Telefon, E-Mail"
-                              rows={3}
-                            />
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                              Optionale Kontaktinformationen für die Fußzeile.
-                            </p>
-                          </div>
-                        </TabsContent>
                       </Tabs>
+
+                      {/* Footer Info Box */}
+                      <Alert className="mt-4">
+                        <FileText className="h-4 w-4" />
+                        <AlertDescription>
+                          <strong>Hinweis:</strong> Der Email-Footer wird global in den{' '}
+                          <a href="/admin/settings" className="underline hover:text-primary">
+                            Firmen-Einstellungen
+                          </a>{' '}
+                          konfiguriert und ist für alle Email-Templates identisch.
+                        </AlertDescription>
+                      </Alert>
 
                       {/* Action Buttons */}
                       <div className="flex gap-3 pt-4 border-t dark:border-gray-700">

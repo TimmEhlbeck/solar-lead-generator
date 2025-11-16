@@ -139,8 +139,10 @@ class EmailTemplate extends Model
 
         $headerTitle = $structured['headerTitle'] ?? 'Willkommen';
         $contentHtml = $structured['contentHtml'] ?? '';
-        $footerText = $structured['footerText'] ?? 'Ihr Partner für nachhaltige Energie';
-        $footerContact = $structured['footerContact'] ?? '';
+
+        // Footer comes from company settings, not from template
+        $footerText = $settings['email_footer_text'] ?? 'Ihr Partner für nachhaltige Energie';
+        $footerContact = $settings['email_footer_contact'] ?? '';
 
         // Don't escape HTML in headerTitle and footerText as they may contain variables
         $html = '<!DOCTYPE html>
