@@ -77,9 +77,9 @@ export const LandingContactForm: React.FC<LandingContactFormProps> = ({ onSubmit
 
   return (
     <Card className="shadow-lg">
-      <CardHeader className="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-gray-800 dark:to-gray-900">
+      <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
         <CardTitle className="flex items-center gap-2 text-2xl">
-          <CheckCircle className="h-6 w-6 text-green-600" />
+          <CheckCircle className="h-6 w-6" style={{ color: 'var(--company-primary)' }} />
           Fast geschafft!
         </CardTitle>
         <CardDescription className="text-base">
@@ -172,7 +172,7 @@ export const LandingContactForm: React.FC<LandingContactFormProps> = ({ onSubmit
           </div>
 
           <div className="border-t pt-4">
-            <div className="flex items-start space-x-3 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
+            <div className="flex items-start space-x-3 p-4 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
               <Checkbox
                 id="create_account"
                 checked={formData.create_account}
@@ -184,7 +184,7 @@ export const LandingContactForm: React.FC<LandingContactFormProps> = ({ onSubmit
                   htmlFor="create_account"
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                 >
-                  <UserPlus className="inline h-4 w-4 mr-1 text-blue-600 dark:text-blue-400" />
+                  <UserPlus className="inline h-4 w-4 mr-1" style={{ color: 'var(--company-primary)' }} />
                   Benutzerkonto erstellen und Zugriff auf mein Projekt erhalten
                 </Label>
                 <p className="text-xs text-muted-foreground mt-1">
@@ -199,6 +199,7 @@ export const LandingContactForm: React.FC<LandingContactFormProps> = ({ onSubmit
             className="w-full"
             size="lg"
             disabled={loading}
+            style={{ backgroundColor: 'var(--company-primary)', color: 'var(--company-text)' }}
           >
             {loading ? (
               <>

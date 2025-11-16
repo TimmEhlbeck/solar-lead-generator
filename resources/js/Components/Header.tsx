@@ -36,6 +36,11 @@ export const Header: React.FC<HeaderProps> = ({
   const displayName = settings.company_name || companyName;
   const logoUrl = settings.company_logo_url;
 
+  // Don't show header if user is not authenticated
+  if (!auth?.user) {
+    return null;
+  }
+
   return (
     <header className="bg-white dark:bg-gray-900 border-b border-border sticky top-0 z-50 shadow-sm">
       <div className="container mx-auto px-4 py-3">
@@ -70,8 +75,8 @@ export const Header: React.FC<HeaderProps> = ({
 
           {/* Navigation */}
           <nav className="flex items-center gap-2">
-            {/* Save Project Button - Only shown if user is authenticated */}
-            {auth?.user && roofs.length > 0 && (
+            {/* Save Project Button - Only shown if there are roofs */}
+            {roofs.length > 0 && (
               <SaveProjectDialog
                 roofs={roofs}
                 mapCenter={mapCenter}
@@ -81,34 +86,15 @@ export const Header: React.FC<HeaderProps> = ({
               />
             )}
 
-            {auth?.user ? (
-              <>
-                <span className="text-sm text-muted-foreground mr-2">
-                  Hallo, {auth.user.name}
-                </span>
-                <Button variant="outline" asChild>
-                  <Link href="/dashboard">
-                    <LayoutDashboard className="h-4 w-4 mr-2" />
-                    Dashboard
-                  </Link>
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button variant="ghost" asChild>
-                  <Link href="/login">
-                    <LogIn className="h-4 w-4 mr-2" />
-                    Anmelden
-                  </Link>
-                </Button>
-                <Button variant="default" asChild>
-                  <Link href="/register">
-                    <UserPlus className="h-4 w-4 mr-2" />
-                    Registrieren
-                  </Link>
-                </Button>
-              </>
-            )}
+            <span className="text-sm text-muted-foreground mr-2">
+              Hallo, {auth.user.name}
+            </span>
+            <Button variant="outline" asChild>
+              <Link href="/dashboard">
+                <LayoutDashboard className="h-4 w-4 mr-2" />
+                Dashboard
+              </Link>
+            </Button>
           </nav>
         </div>
       </div>
