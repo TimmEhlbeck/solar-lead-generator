@@ -110,7 +110,7 @@ export default function UserManagement({ auth, users, roles }: UserManagementPro
   };
 
   const getRoleBadge = (user: User) => {
-    const role = user.roles[0] || 'user';
+    const role = user.roles[0] || 'customer';
 
     if (role === 'admin') {
       return (
@@ -133,7 +133,7 @@ export default function UserManagement({ auth, users, roles }: UserManagementPro
     return (
       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">
         <UserIcon className="h-3 w-3" />
-        Benutzer
+        Kunde
       </span>
     );
   };
@@ -395,7 +395,7 @@ export default function UserManagement({ auth, users, roles }: UserManagementPro
                   onChange={(e) => setData('role', e.target.value)}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
-                  <option value="user">Benutzer</option>
+                  <option value="customer">Kunde</option>
                   <option value="sales">Vertrieb</option>
                   <option value="admin">Administrator</option>
                 </select>
@@ -492,7 +492,7 @@ export default function UserManagement({ auth, users, roles }: UserManagementPro
                   onChange={(e) => setData('role', e.target.value)}
                   className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 >
-                  <option value="user">Benutzer</option>
+                  <option value="customer">Kunde</option>
                   <option value="sales">Vertrieb</option>
                   <option value="admin">Administrator</option>
                 </select>
