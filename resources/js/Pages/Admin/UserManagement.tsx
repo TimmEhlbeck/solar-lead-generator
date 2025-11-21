@@ -62,7 +62,7 @@ export default function UserManagement({ auth, users, roles }: UserManagementPro
     email: '',
     password: '',
     password_confirmation: '',
-    role: 'user',
+    role: 'customer',
   });
 
   const handleCreate = () => {
