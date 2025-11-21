@@ -42,7 +42,7 @@ export const Header: React.FC<HeaderProps> = ({
   }
 
   return (
-    <header className="bg-white dark:bg-gray-900 border-b border-border sticky top-0 z-50 shadow-sm">
+    <header className="border-b border-border sticky top-0 z-50 shadow-sm" style={{ backgroundColor: 'var(--company-primary)' }}>
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo & Company Name */}
@@ -51,23 +51,23 @@ export const Header: React.FC<HeaderProps> = ({
               {logoUrl ? (
                 <img src={logoUrl} alt={displayName} className="h-10 w-auto object-contain" />
               ) : (
-                <div className="rounded-lg p-2" style={{ backgroundColor: 'var(--company-primary)' }}>
+                <div className="rounded-lg p-2 bg-white bg-opacity-20">
                   <Sun className="h-6 w-6" style={{ color: 'var(--company-text)' }} />
                 </div>
               )}
               <div>
-                <h1 className="text-xl font-bold text-foreground">{displayName}</h1>
-                <p className="text-xs text-muted-foreground">Solar Panel Planner</p>
+                <h1 className="text-xl font-bold" style={{ color: 'var(--company-text)' }}>{displayName}</h1>
+                <p className="text-xs" style={{ color: 'var(--company-text)', opacity: 0.8 }}>Solar Panel Planner</p>
               </div>
             </Link>
 
             {/* Current Project Indicator */}
             {projectName && (
-              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-muted rounded-lg border border-border">
-                <FileText className="h-4 w-4 text-muted-foreground" />
+              <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-white bg-opacity-20 rounded-lg">
+                <FileText className="h-4 w-4" style={{ color: 'var(--company-text)' }} />
                 <div className="flex flex-col">
-                  <span className="text-xs text-muted-foreground">Bearbeite:</span>
-                  <span className="text-sm font-medium text-foreground">{projectName}</span>
+                  <span className="text-xs" style={{ color: 'var(--company-text)', opacity: 0.8 }}>Bearbeite:</span>
+                  <span className="text-sm font-medium" style={{ color: 'var(--company-text)' }}>{projectName}</span>
                 </div>
               </div>
             )}
@@ -86,10 +86,15 @@ export const Header: React.FC<HeaderProps> = ({
               />
             )}
 
-            <span className="text-sm text-muted-foreground mr-2">
+            <span className="text-sm mr-2" style={{ color: 'var(--company-text)' }}>
               Hallo, {auth.user.name}
             </span>
-            <Button variant="outline" asChild>
+            <Button
+              variant="outline"
+              asChild
+              className="bg-white bg-opacity-20 border-white border-opacity-30 hover:bg-white hover:bg-opacity-30"
+              style={{ color: 'var(--company-text)' }}
+            >
               <Link href="/dashboard">
                 <LayoutDashboard className="h-4 w-4 mr-2" />
                 Dashboard
