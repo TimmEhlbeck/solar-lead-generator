@@ -284,12 +284,7 @@ export default function UserManagement({ auth, users, roles }: UserManagementPro
                             <Button
                               variant="outline"
                               size="sm"
-                              onClick={() => router.post(route('admin.users.verify', user.id), {}, {
-                                preserveScroll: true,
-                                onSuccess: () => {
-                                  router.reload({ only: ['users'] });
-                                }
-                              })}
+                              onClick={() => router.post(route('admin.users.verify', user.id))}
                               className="ml-2"
                             >
                               <CheckCircle className="h-4 w-4 mr-1" />

@@ -105,14 +105,14 @@ class UserManagementController extends Controller
     public function verify(User $user)
     {
         if ($user->email_verified_at) {
-            return redirect()->back()->withErrors(['error' => 'Benutzer ist bereits verifiziert.']);
+            return redirect()->route('admin.users.index')->withErrors(['error' => 'Benutzer ist bereits verifiziert.']);
         }
 
         $user->update([
             'email_verified_at' => now(),
         ]);
 
-        return redirect()->back()->with('success', 'Benutzer erfolgreich verifiziert.');
+        return redirect()->route('admin.users.index')->with('success', 'Benutzer erfolgreich verifiziert.');
     }
 
     /**
