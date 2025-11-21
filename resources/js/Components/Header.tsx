@@ -42,7 +42,7 @@ export const Header: React.FC<HeaderProps> = ({
   }
 
   return (
-    <header className="border-b border-border sticky top-0 z-50 shadow-sm" style={{ backgroundColor: 'var(--company-primary)' }}>
+    <header className="border-b border-border sticky top-0 z-50 shadow-sm" style={{ backgroundColor: 'var(--company-background)' }}>
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Logo & Company Name */}
