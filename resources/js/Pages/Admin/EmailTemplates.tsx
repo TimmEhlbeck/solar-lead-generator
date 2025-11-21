@@ -342,8 +342,8 @@ export default function EmailTemplates({ auth, templates }: EmailTemplatesPagePr
       <div className="py-12">
         <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
           {successMessage && (
-            <Alert className="mb-6 bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
-              <AlertDescription className="text-green-800 dark:text-green-200">
+            <Alert className="mb-6 bg-primary/10 dark:bg-primary/20 border-primary/30 dark:border-primary/40">
+              <AlertDescription className="text-primary dark:text-primary">
                 {successMessage}
               </AlertDescription>
             </Alert>
@@ -393,18 +393,18 @@ export default function EmailTemplates({ auth, templates }: EmailTemplatesPagePr
                     </CardHeader>
                     <CardContent className="space-y-6">
                       {/* Variables Info */}
-                      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                      <div className="bg-accent/10 dark:bg-accent/20 border border-accent/30 dark:border-accent/40 rounded-lg p-4">
                         <div className="flex items-start gap-2">
-                          <FileText className="h-5 w-5 text-blue-600 dark:text-blue-400 mt-0.5" />
+                          <FileText className="h-5 w-5 text-accent dark:text-accent mt-0.5" />
                           <div className="flex-1">
-                            <h4 className="font-medium text-sm text-blue-900 dark:text-blue-100 mb-2">
+                            <h4 className="font-medium text-sm text-accent dark:text-accent mb-2">
                               Verfügbare Variablen
                             </h4>
                             <div className="flex flex-wrap gap-2">
                               {selectedTemplate.variables.map((variable) => (
                                 <code
                                   key={variable}
-                                  className="px-2 py-1 bg-white dark:bg-gray-800 border border-blue-200 dark:border-blue-700 rounded text-xs font-mono cursor-pointer hover:bg-blue-50 dark:hover:bg-blue-900/30"
+                                  className="px-2 py-1 bg-white dark:bg-gray-800 border border-accent/30 dark:border-accent/40 rounded text-xs font-mono cursor-pointer hover:bg-accent/10 dark:hover:bg-accent/20"
                                   onClick={() => {
                                     navigator.clipboard.writeText(`{{${variable}}}`);
                                   }}
@@ -414,7 +414,7 @@ export default function EmailTemplates({ auth, templates }: EmailTemplatesPagePr
                                 </code>
                               ))}
                             </div>
-                            <p className="text-xs text-blue-700 dark:text-blue-300 mt-2">
+                            <p className="text-xs text-accent dark:text-accent mt-2">
                               Klicken Sie auf eine Variable, um sie zu kopieren. Diese werden automatisch mit echten Daten ersetzt.
                             </p>
                           </div>

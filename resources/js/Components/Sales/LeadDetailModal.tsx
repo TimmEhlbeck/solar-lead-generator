@@ -104,12 +104,12 @@ const formatFileSize = (bytes: number): string => {
 };
 
 const statusConfig: Record<string, { label: string; color: string }> = {
-  new: { label: 'Neu', color: 'bg-blue-100 text-blue-800' },
-  assigned: { label: 'Zugewiesen', color: 'bg-purple-100 text-purple-800' },
-  contacted: { label: 'Kontaktiert', color: 'bg-yellow-100 text-yellow-800' },
-  qualified: { label: 'Qualifiziert', color: 'bg-indigo-100 text-indigo-800' },
-  converted: { label: 'Konvertiert', color: 'bg-green-100 text-green-800' },
-  lost: { label: 'Verloren', color: 'bg-gray-100 text-gray-800' },
+  new: { label: 'Neu', color: 'bg-primary/10 text-primary' },
+  assigned: { label: 'Zugewiesen', color: 'bg-secondary/10 text-secondary' },
+  contacted: { label: 'Kontaktiert', color: 'bg-accent/10 text-accent' },
+  qualified: { label: 'Qualifiziert', color: 'bg-primary/20 text-primary' },
+  converted: { label: 'Konvertiert', color: 'bg-primary/30 text-primary' },
+  lost: { label: 'Verloren', color: 'bg-secondary/20 text-secondary' },
 };
 
 export default function LeadDetailModal({ leadId, open, onClose }: LeadDetailModalProps) {
@@ -177,13 +177,13 @@ export default function LeadDetailModal({ leadId, open, onClose }: LeadDetailMod
                   </div>
                   <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-gray-500" />
-                    <a href={`mailto:${lead.email}`} className="text-blue-600 hover:underline">
+                    <a href={`mailto:${lead.email}`} className="text-primary hover:underline">
                       {lead.email}
                     </a>
                   </div>
                   <div className="flex items-center gap-2">
                     <Phone className="h-4 w-4 text-gray-500" />
-                    <a href={`tel:${lead.phone}`} className="text-blue-600 hover:underline">
+                    <a href={`tel:${lead.phone}`} className="text-primary hover:underline">
                       {lead.phone}
                     </a>
                   </div>
@@ -344,7 +344,7 @@ export default function LeadDetailModal({ leadId, open, onClose }: LeadDetailMod
                     </div>
                     <div className="flex items-center gap-2">
                       <Mail className="h-4 w-4 text-gray-500" />
-                      <a href={`mailto:${lead.project.user.email}`} className="text-blue-600 hover:underline">
+                      <a href={`mailto:${lead.project.user.email}`} className="text-primary hover:underline">
                         {lead.project.user.email}
                       </a>
                     </div>
@@ -414,7 +414,7 @@ export default function LeadDetailModal({ leadId, open, onClose }: LeadDetailMod
                       {lead.project.timeline_events.map((event) => (
                         <div key={event.id} className="flex gap-3">
                           <div className="flex flex-col items-center">
-                            <div className="h-2 w-2 bg-blue-500 rounded-full mt-2" />
+                            <div className="h-2 w-2 bg-primary rounded-full mt-2" />
                             <div className="w-px bg-gray-300 flex-1 mt-1" />
                           </div>
                           <div className="flex-1 pb-4">

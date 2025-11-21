@@ -90,7 +90,7 @@ class EmailTemplate extends Model
         $data['company_name'] = $settings['company_name'] ?? config('app.name');
 
         // Add company colors
-        $data['primary_color'] = $settings['primary_color'] ?? '#0A2540';
+        $data['primary_color'] = $settings['primary_color'] ?? '#EAB308';
         $data['secondary_color'] = $settings['secondary_color'] ?? '#1F2937';
         $data['accent_color'] = $settings['accent_color'] ?? '#3B82F6';
 

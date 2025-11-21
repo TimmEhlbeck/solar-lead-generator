@@ -103,12 +103,12 @@ interface SalesLeadsProps {
 }
 
 const statusConfig: Record<LeadStatus, { label: string; color: string }> = {
-  new: { label: 'Neu', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300' },
-  assigned: { label: 'Zugewiesen', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-300' },
-  contacted: { label: 'Kontaktiert', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' },
-  qualified: { label: 'Qualifiziert', color: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-300' },
-  converted: { label: 'Konvertiert', color: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' },
-  lost: { label: 'Verloren', color: 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300' },
+  new: { label: 'Neu', color: 'bg-primary/10 text-primary dark:bg-primary/20 dark:text-primary' },
+  assigned: { label: 'Zugewiesen', color: 'bg-secondary/10 text-secondary dark:bg-secondary/20 dark:text-secondary' },
+  contacted: { label: 'Kontaktiert', color: 'bg-accent/10 text-accent dark:bg-accent/20 dark:text-accent' },
+  qualified: { label: 'Qualifiziert', color: 'bg-primary/20 text-primary dark:bg-primary/30 dark:text-primary' },
+  converted: { label: 'Konvertiert', color: 'bg-primary/30 text-primary dark:bg-primary/40 dark:text-primary' },
+  lost: { label: 'Verloren', color: 'bg-secondary/20 text-secondary dark:bg-secondary/30 dark:text-secondary' },
 };
 
 const requestTypeConfig: Record<RequestType, { label: string; icon: typeof FileText }> = {

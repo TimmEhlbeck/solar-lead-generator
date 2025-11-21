@@ -21,7 +21,7 @@
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
         .header {
-            background-color: {{ $primaryColor ?? '#0A2540' }};
+            background-color: {{ $primaryColor ?? '#EAB308' }};
             color: white;
             padding: 30px;
             text-align: center;
@@ -48,7 +48,7 @@
         .button {
             display: inline-block;
             padding: 12px 24px;
-            background-color: {{ $primaryColor ?? '#0A2540' }};
+            background-color: {{ $primaryColor ?? '#EAB308' }};
             color: white !important;
             text-decoration: none;
             border-radius: 6px;
@@ -61,7 +61,7 @@
         .info-box {
             background-color: #ffffff;
             padding: 20px;
-            border-left: 4px solid {{ $primaryColor ?? '#0A2540' }};
+            border-left: 4px solid {{ $primaryColor ?? '#EAB308' }};
             margin: 20px 0;
             border-radius: 4px;
         }
