@@ -26,10 +26,10 @@
     --radius: 0.5rem;
 
     /* Company theme colors - can be overridden dynamically */
-    --company-primary: #EAB308;
-    --company-secondary: #1F2937;
-    --company-accent: #3B82F6;
-    --company-background: #111827;
+    --company-primary: #eb5c05;
+    --company-secondary: #20307d;
+    --company-accent: #eb5c05;
+    --company-background: #20307d;
     --company-text: #FFFFFF;
   }
 
