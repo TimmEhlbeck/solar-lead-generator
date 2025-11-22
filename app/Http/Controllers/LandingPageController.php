@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Mail\WelcomeUserMail;
+use App\Models\CompanySetting;
 use App\Models\Lead;
 use App\Models\Project;
 use App\Models\RoofArea;
@@ -40,10 +41,13 @@ class LandingPageController extends Controller
             }
         }
 
+        $settings = CompanySetting::getAllSettings();
+
         return Inertia::render('LandingPlanner', [
-            'companyName' => config('app.name'),
+            'companyName' => $settings['company_name'] ?? config('app.name'),
             'googleMapsApiKey' => $mapsKey,
             'geminiApiKey' => $geminiKey,
+            'companySettings' => $settings,
         ]);
     }
 

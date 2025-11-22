@@ -55,10 +55,6 @@ export const Header: React.FC<HeaderProps> = ({
                   <Sun className="h-6 w-6" style={{ color: 'var(--company-text)' }} />
                 </div>
               )}
-              <div>
-                <h1 className="text-xl font-bold" style={{ color: 'var(--company-text)' }}>{displayName}</h1>
-                <p className="text-xs" style={{ color: 'var(--company-text)', opacity: 0.8 }}>Solar Panel Planner</p>
-              </div>
             </Link>
 
             {/* Current Project Indicator */}
